@@ -118,3 +118,5 @@ bootimage工具执行了三个步骤
 ```
   qemu-system-x86_64 -drive format=raw,file=bootimage-my_os.bin
 ```
+当机器启动时，引导程序将会读取并解析拼接在其后的ELF文件。然后把program segments 映射到分页表（page table）中的虚拟地址（virtual address），清零BSS段（BSS segment），还将创建一个栈。
+最终它将读取入口点地址（entry point address）_start函数的位置—, 并跳转到这个位置。
