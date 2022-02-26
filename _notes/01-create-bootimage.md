@@ -13,7 +13,7 @@
 ## Build target
 在默认情况下，cargo会为特定的宿主系统（host system）构建源码
 
-内核不应该被编译为一个特定的目标系统（target system）
+内核应该被编译为一个特定的目标系统（target system）配置文件为：
 
 build config: x86_64-my_os.json
 ```
@@ -41,7 +41,7 @@ build config: x86_64-my_os.json
 "linker-flavor": "ld.lld",
 "linker": "rust-lld",
 ```
-不能使用平台默认提供的链接器，因为它可能不支持Linux目标系统。为了链接我们的内核，使用跨平台的LLD链接器（LLD linker），它是和Rust打包发布的
+不能使用平台默认提供的链接器，因为它可能不支持Linux目标系统。为了链接内核需要使用跨平台的LLD链接器（LLD linker），它是和Rust打包发布的
 
 ```
 "panic-strategy": "abort",
@@ -60,12 +60,10 @@ features配置项被用来启用或禁用某个目标CPU特征（CPU feature）�
 
 ## Build tools
 为了搭建一个操作系统，需要一些只有nightly会提供的实验性功能，所以需要安装一个nightly版本的Rust。
-可以输入
 ```
 rustup override add nightly
 ```
-来选择在当前目录使用nightly版本的Rust
-
+此命令选择在当前目录使用nightly版本的Rust
 
 通常状况下，core库以预编译库（precompiled library）的形式与Rust编译器一同发布——这时，core库只对支持的宿主系统有效，而我们自定义的目标系统无效。如果我们想为其它系统编译代码，我们需要为这些系统重新编译整个core库, 因此需要按装cargo-xbuild, 这个工具封装了cargo build
 
