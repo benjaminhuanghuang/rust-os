@@ -1,4 +1,6 @@
 
+https://os.phil-opp.com/minimal-rust-kernel/
+
 1. 使用 bootimage 准备引导程序
 BIOS 会加载引导程序, 
 - 引导程序必须决定内核的位置，并将内核加载到内存

@@ -1,3 +1,4 @@
+#![feature(asm)]
 #![no_std] // 不链接Rust标准库
 #![no_main] // 禁用所有Rust层级的入口点
 
