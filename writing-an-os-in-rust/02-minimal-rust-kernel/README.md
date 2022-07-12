@@ -9,7 +9,7 @@ Multiboot标准 定义了引导程序和操作系统间的统一接口
 
 只需要在内核文件开头，插入被称作Multiboot头（Multiboot header）的数据片段。GRUB这样的bootloader就可以引导这个内核文件
 
-2. 准备内核
+2. 配置 target
 在默认情况下，cargo会为特定的宿主系统（host system）构建源码，而内核不应该基于另一个操作系统，内核需要编译为一个特定的target system
 
 通过json 文件描述target system
@@ -33,12 +33,13 @@ Multiboot标准 定义了引导程序和操作系统间的统一接口
 
 
 3. Build, 同时为目标系统重新编译整个core库
+
 首先选择在当前目录使用nightly版本的Rust
 ```
 rustup override add nightly
 ```
 
-- Cargo xbuild
+安装 Cargo xbuild
 Cargo xbuild 封装了cargo build. 不同的是，它将自动交叉编译core库和一些编译器内建库（compiler built-in libraries）。
 ```
 cargo install cargo-xbuild
@@ -56,6 +57,10 @@ cargo xbuild --target x86_64-blog_os.json
 # in .cargo/config
 [build]
 target = "x86_64-blog_os.json"
+
+[unstable]
+build-std-features = ["compiler-builtins-mem"]
+build-std = ["core", "compiler_builtins"]
 ```
 直接Build
 ```
@@ -73,7 +78,7 @@ cargo xbuild
 ```
 # in Cargo.toml
 [dependencies]
-bootloader = "0.6.0"
+bootloader = "0.9.3"
 ```
 install
 ```

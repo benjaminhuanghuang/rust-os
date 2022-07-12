@@ -11,9 +11,5 @@ panic = "abort" # 禁用panic时栈展开
 [profile.release]
 panic = "abort" # 禁用panic时栈展开
 
-[unstable]
-build-std-features = ["compiler-builtins-mem"]
-build-std = ["core", "compiler_builtins"]
-
 [dependencies]
 bootloader = "0.6.0"
