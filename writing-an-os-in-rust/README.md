@@ -1,11 +1,9 @@
-
 htts://github.com/phil-opp/blog_os
 https://os.phil-opp.com/
 https://os.phil-opp.com/zh-CN/freestanding-rust-binary/
 
+- Chinese version
 
-- Chinese version 
   - https://github.com/rustcc/writing-an-os-in-rust
 
-  - https://www.bilibili.com/medialist/play/ml966774072/BV1gC4y1p7zm?oid=795746169&otype=2
-
+  - https://www.bilibili.com/medialist/play/ml966774072

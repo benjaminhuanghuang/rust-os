@@ -1,10 +1,11 @@
 use volatile::Volatile;
 
-#[allow(dead_code)]
+#[allow(dead_code)] // some enums are dead code
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-//repr(u8)属性，每个枚举变体都存储u8. 实际上 4 位就足够了，但 Rust 没有u4类型。
+//repr(u8) 表示enum variant is stored as an u8. 实际上 4 位就足够了，但 Rust 没有u4类型。
 #[repr(u8)]
 pub enum Color {
+  // C-like enum
   Black = 0,
   Blue = 1,
   Green = 2,
@@ -23,7 +24,7 @@ pub enum Color {
   White = 15,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-//
+// 保证内存布局与其中的单字段相同
 #[repr(transparent)]
 struct ColorCode(u8);
 
@@ -33,7 +34,7 @@ impl ColorCode {
   }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(C)]
+#[repr(C)] // C-like 保证字段顺序
 struct ScreenChar {
   ascii_character: u8,
   color_code: ColorCode,
@@ -44,19 +45,23 @@ const BUFFER_WIDTH: usize = 80;
 
 #[repr(transparent)]
 struct Buffer {
-  chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
+  //chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
+  chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 pub struct Writer {
   column_position: usize,
   color_code: ColorCode,
+  // reference life time is whole program run time
   buffer: &'static mut Buffer,
 }
 
 impl Writer {
   pub fn write_byte(&mut self, byte: u8) {
     match byte {
+      // new line
       b'\n' => self.new_line(),
+      // normal char
       byte => {
         if self.column_position >= BUFFER_WIDTH {
           self.new_line();
@@ -79,6 +84,7 @@ impl Writer {
   }
 
   pub fn write_string(&mut self, s: &str) {
+    // writh bytes in &str
     for byte in s.bytes() {
       match byte {
         // printable ASCII byte or newline
@@ -89,10 +95,15 @@ impl Writer {
     }
   }
 }
+
+// For testing
 pub fn print_something() {
   let mut writer = Writer {
     column_position: 0,
     color_code: ColorCode::new(Color::Yellow, Color::Black),
+    // cast 0xb8000 as an mutable raw poiniter
+    // covert it to a mutalbe reference by dereferening it through *
+    // borrow it through &mut
     buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
   };
 

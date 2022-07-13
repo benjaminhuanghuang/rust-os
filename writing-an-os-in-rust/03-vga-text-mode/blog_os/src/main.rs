@@ -2,9 +2,9 @@
 #![no_std] // 不链接Rust标准库
 #![no_main] // 禁用所有Rust层级的入口点
 
-use core::panic::PanicInfo;
+mod vga_buffer;
 
-static HELLO: &[u8] = b"Hello World!";
+use core::panic::PanicInfo;
 
 #[no_mangle] // 不重整函数名
 pub extern "C" fn _start() -> ! {
