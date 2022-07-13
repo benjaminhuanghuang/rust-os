@@ -7,3 +7,5 @@ https://os.phil-opp.com/zh-CN/freestanding-rust-binary/
 - Chinese version 
   - https://github.com/rustcc/writing-an-os-in-rust
 
+  - https://www.bilibili.com/medialist/play/ml966774072/BV1gC4y1p7zm?oid=795746169&otype=2
+
