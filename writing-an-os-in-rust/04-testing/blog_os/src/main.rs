@@ -1,10 +1,12 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(blog_os::test_runner)]
+#![test_runner(crate::test_runner)]
+// custom test frame create test_main()
 #![reexport_test_harness_main = "test_main"]
 
-use blog_os::println;
+mod vga_buffer;
+// use blog_os::println;
 use core::panic::PanicInfo;
 
 #[no_mangle]
@@ -16,9 +18,8 @@ pub extern "C" fn _start() -> ! {
 
   loop {}
 }
-
 /// This function is called on panic.
-#[cfg(not(test))]
+//#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
   println!("{}", info);
@@ -26,9 +27,11 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[cfg(test)]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-  blog_os::test_panic_handler(info)
+fn test_runner(tests: &[&dyn Fn()]) {
+  println!("Running {} tests", tests.len());
+  for test in tests {
+    test();
+  }
 }
 
 #[test_case]
