@@ -262,3 +262,20 @@ This means that each test needs to define its own entry point function.
 ## Refactor
 
 Move code into lib.rs
+
+## panic test
+
+The test framework of the standard library supports a #[should_panic] attribute.
+this attribute isn’t supported in #[no_std]
+
+对于多个#[test_case]函数， panic 发生时只能执行第一个处理函数, 后面的无法继续执行
+
+因此 需要 禁用 test runner 并直接在\_start 函数中运行测试。
+
+```
+# in Cargo.toml
+
+[[test]]
+name = "should_panic"
+harness = false
+```
