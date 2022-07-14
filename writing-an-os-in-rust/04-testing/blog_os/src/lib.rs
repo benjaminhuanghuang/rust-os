@@ -12,7 +12,7 @@ pub mod vga_buffer;
 pub trait Testable {
   fn run(&self) -> ();
 }
-
+// Insert Printing for every test, call test.run() in test_runner
 impl<T> Testable for T
 where
   T: Fn(),
@@ -24,11 +24,14 @@ where
   }
 }
 
-pub fn test_runner(tests: &[&dyn Testable]) {
+#[cfg(test)]
+fn test_runner(tests: &[&dyn Testable]) {
+  // print test result to host console
   serial_println!("Running {} tests", tests.len());
   for test in tests {
-    test.run();
+    test.run(); // Testable
   }
+  /// new
   exit_qemu(QemuExitCode::Success);
 }
 
@@ -50,12 +53,13 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
   use x86_64::instructions::port::Port;
 
   unsafe {
+    // 写端口 0xf4, I/O size 为 4(u32)
     let mut port = Port::new(0xf4);
     port.write(exit_code as u32);
   }
 }
 
-/// Entry point for `cargo xtest`
+/// Entry point for `cargo test`
 #[cfg(test)]
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -67,4 +71,12 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
   test_panic_handler(info)
+}
+
+/// This function is called on panic.
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+  println!("{}", info);
+  loop {}
 }

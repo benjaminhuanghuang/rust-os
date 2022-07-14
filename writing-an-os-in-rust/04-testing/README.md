@@ -12,7 +12,7 @@ custom_test_frameworks 的工作原理是收集所有标注了 #[test_case]属�
 
 Custom Test Framwork 会生成一个 main 函数来调用 test_runner，但是由于使用了 #[no_main]并提供了指定 \_start 为入口点，所以这个 main 函数就被忽略了。
 
-需要通过 reexport_test_harness_main 属性来将 Custom Test Framwork 生成的函数的名称更改为与 main 不同的名称。然后在入口函数\_start 里调用这个重命名的函数
+需要通过 reexport_test_harness_main 属性来将 Custom Test Framwork 生成的 entry point function 更改为与 test_main 。然后在入口函数\_start 里调用这个重命名的函数
 
 ```
 // in src/main.rs
@@ -192,3 +192,71 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 ```
+
+通过 bootimage 向 qemu 传递参数, 隐藏 qemu 窗口, 这样就可以在没有 GUI 的情况下执行测试
+
+```
+# in Cargo.toml
+
+[package.metadata.bootimage]
+test-args = [
+    "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
+    "-display", "none"
+]
+```
+
+设置超时
+If the test does not finish in this time, bootimage is marked as failed and a “Timed Out” error is printed to the console.
+
+```
+# in Cargo.toml
+
+[package.metadata.bootimage]
+test-timeout = 300          # (in seconds)
+```
+
+## Unit Test
+
+```
+// Insert Printing for every test, call test.run() in test_runner
+
+pub trait Testable {
+  fn run(&self) -> ();
+}
+
+impl<T> Testable for T
+where
+  T: Fn(),
+{
+  fn run(&self) {
+    serial_print!("{}...\t", core::any::type_name::<T>());
+    self();
+    serial_println!("[ok]");
+  }
+}
+```
+
+修改 test_runner 的传入参数类型 为 Testable 并调用 test.run
+
+```
+#[cfg(test)]
+fn test_runner(tests: &[&dyn Testable]) {
+  // print test result to host console
+  serial_println!("Running {} tests", tests.len());
+  for test in tests {
+    test.run(); // Testable
+  }
+  /// new
+  exit_qemu(QemuExitCode::Success);
+}
+
+```
+
+## Integration Test
+
+All integration tests are their own executables and completely separate from our main.rs.
+This means that each test needs to define its own entry point function.
+
+## Refactor
+
+Move code into lib.rs
