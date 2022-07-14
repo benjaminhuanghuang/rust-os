@@ -5,6 +5,7 @@
 // custom test FWK create test_main()
 #![reexport_test_harness_main = "test_main"]
 
+mod serial;
 mod vga_buffer;
 // use blog_os::println;
 use core::panic::PanicInfo;
@@ -28,7 +29,9 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[cfg(test)]
 fn test_runner(tests: &[&dyn Fn()]) {
-  println!("Running {} tests", tests.len());
+  //println!("Running {} tests", tests.len());
+  // print test result to host console
+  serial_println!("Running {} tests", tests.len());
   for test in tests {
     test();
   }
@@ -38,7 +41,9 @@ fn test_runner(tests: &[&dyn Fn()]) {
 
 #[test_case]
 fn trivial_assertion() {
+  serial_print!("trivial assertion... ");
   assert_eq!(1, 1);
+  serial_println!("[ok]");
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
