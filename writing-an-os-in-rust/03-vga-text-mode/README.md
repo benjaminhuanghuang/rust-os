@@ -13,7 +13,7 @@ VGA Text Buffer 25 行、80 列 共 2000 个字符单元（character cell）
 12-14 background color
 15 blink
 
-## Create vga_buffer
+## Encapsulates the unsafety writing memory to vga_buffer.rs
 
 ## volatile
 
@@ -49,9 +49,15 @@ self.buffer.chars[row][col].write(ScreenChar {
 
 ## Global interface
 
-希望 writer 可以被全局访问,而不是被作为变量到处传递
+希望 writer 可以被全局访问,而不是被作为变量到处传递, 因此希望使用
 
-lazy_static! 定义的 intance 会在第一次被访问时初始化
+```
+  pub static WRITER: Writer
+```
+
+然而此路不通, 原因是 `statics are initialized at compile time, in contrast to normal variables that are initialized at run time.` Rust’s const evaluator(编译时 evaluator) is not able to convert raw pointers to references at compile time.
+
+lazy_static! 定义的 intance 会在第一次被访问时初始化, 而不是在编译时计算
 
 ```
 [dependencies.lazy_static]
@@ -60,6 +66,14 @@ features = ["spin_no_std"]
 ```
 
 ## Spinlocks
+
+可以全局访问的 WRITER 需要是 mutable 的, 这又导致了线程安全问题.
+
+Mutex provides mutual exclusion by blocking threads when the resource is already locked.
+
+Spinlock: instead of blocking, the threads simply try to lock it again and again in a tight loop and thus burn CPU time until the mutex is free again.
+
+此时的代码中尚没有线程的概念
 
 ```
 # in Cargo.toml

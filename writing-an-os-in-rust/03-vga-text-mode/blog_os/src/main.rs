@@ -24,5 +24,6 @@ pub extern "C" fn _start() -> ! {
 /// 这个函数将在panic时被调用
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+  println!("{}", info);
   loop {}
 }
