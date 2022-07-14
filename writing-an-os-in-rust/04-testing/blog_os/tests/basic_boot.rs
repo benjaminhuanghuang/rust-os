@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
+// 指定 test runner
 #![test_runner(blog_os::test_runner)]
 //integration tests are their own executables, needs to define its own entry point function.
 #![reexport_test_harness_main = "test_main"]

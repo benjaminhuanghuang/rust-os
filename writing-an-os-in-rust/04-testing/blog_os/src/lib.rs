@@ -1,4 +1,5 @@
 #![no_std]
+// 只有在集成测试的时候lib才会生成test_main
 #![cfg_attr(test, no_main)]
 #![feature(custom_test_frameworks)]
 #![test_runner(crate::test_runner)]
@@ -24,14 +25,13 @@ where
   }
 }
 
-#[cfg(test)]
-fn test_runner(tests: &[&dyn Testable]) {
+// #[cfg(test)] // 去掉 #[cfg(test)], 使得 integration 也可以使用 test_runner
+pub fn test_runner(tests: &[&dyn Testable]) {
   // print test result to host console
   serial_println!("Running {} tests", tests.len());
   for test in tests {
     test.run(); // Testable
   }
-  /// new
   exit_qemu(QemuExitCode::Success);
 }
 
@@ -60,7 +60,7 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
 }
 
 /// Entry point for `cargo test`
-#[cfg(test)]
+#[cfg(test)] // 只有在集成测试的时候lib才会生成test_main
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
   test_main();
@@ -71,12 +71,4 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
   test_panic_handler(info)
-}
-
-/// This function is called on panic.
-#[cfg(not(test))]
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-  println!("{}", info);
-  loop {}
 }

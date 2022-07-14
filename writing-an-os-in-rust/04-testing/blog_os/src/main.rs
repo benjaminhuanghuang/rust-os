@@ -1,12 +1,9 @@
 #![no_std]
 #![no_main]
 #![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
-// custom test FWK create test_main()
+#![test_runner(blog_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-mod serial;
-mod vga_buffer;
 use blog_os::println;
 use core::panic::PanicInfo;
 
@@ -20,9 +17,16 @@ pub extern "C" fn _start() -> ! {
   loop {}
 }
 
-#[test_case]
-fn trivial_assertion() {
-  serial_print!("trivial assertion... ");
-  assert_eq!(1, 1);
-  serial_println!("[ok]");
+/// This function is called on panic.
+#[cfg(not(test))]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+  println!("{}", info);
+  loop {}
+}
+
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+  blog_os::test_panic_handler(info)
 }

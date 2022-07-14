@@ -257,6 +257,8 @@ fn test_runner(tests: &[&dyn Testable]) {
 All integration tests are their own executables and completely separate from our main.rs.
 This means that each test needs to define its own entry point function.
 
+去掉 test_runner 上的 #[cfg(test)], 加上 pub, 使得 integration 也可以使用 test_runner
+
 ## Refactor
 
 Move code into lib.rs
