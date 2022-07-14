@@ -1,6 +1,7 @@
 # VAG Text mode
 
 https://os.phil-opp.com/vga-text-mode/
+https://github.com/phil-opp/blog_os/tree/post-03
 
 ## VGA text buffer
 
@@ -79,4 +80,12 @@ Spinlock: instead of blocking, the threads simply try to lock it again and again
 # in Cargo.toml
 [dependencies]
 spin = "0.5.2"
+```
+
+## Print
+
+```
+  println!("Hello world {}", "OS");
+
+  panic!("Some panic message");
 ```
