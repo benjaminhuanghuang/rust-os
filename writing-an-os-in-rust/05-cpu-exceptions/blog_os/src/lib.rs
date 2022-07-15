@@ -70,6 +70,7 @@ pub fn init() {
 #[cfg(test)] // 只有在集成测试的时候lib才会生成test_main
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+  init(); // init IDT
   test_main();
   loop {}
 }

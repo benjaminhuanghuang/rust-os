@@ -46,3 +46,9 @@ need
 
 注意 IDT 生命周期要 是 static 的
 因为 OS 本身还没有 heap 的概念, 因此也不能用 Box
+
+## Test
+
+```
+cargo test --lib
+```
