@@ -61,6 +61,11 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
   }
 }
 
+// 以便os, test 公用代码
+pub fn init() {
+  interrupts::init_idt();
+}
+
 /// Entry point for `cargo test`
 #[cfg(test)] // 只有在集成测试的时候lib才会生成test_main
 #[no_mangle]
