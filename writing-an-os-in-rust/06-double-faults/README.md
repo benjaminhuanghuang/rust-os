@@ -58,3 +58,16 @@ extern "x86-interrupt" fn double_fault_handler(
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
 ```
+
+## Kernel Stack Overflow
+
+guard page 是存在栈底的特定内存页, 用来发现栈溢出
+引导程序（bootloader）为内核栈建立了保护页
+
+## Switching Stacks
+
+x86_64 架构可以在异常发生时切换到预定义且已知良好的栈中。这个切换发生在硬件级别，所以它可以在 CPU 压入异常栈帧之前完成。
+
+在 32 位模式下，TSS (Task State Segment)被用来保存任务（task）相关的各种信息（例如寄存器的状态），包括硬件上下文切换（hardware context switching）等。
+
+在 x86_64 架构下，TSS 不再保存任何关于任务（task）的信息。
