@@ -20,7 +20,6 @@ pub fn _print(args: ::core::fmt::Arguments) {
 
   //disable interrupts as long as the Mutex is locked
   use x86_64::instructions::interrupts; // new
-
   interrupts::without_interrupts(|| {
     // new
     SERIAL1

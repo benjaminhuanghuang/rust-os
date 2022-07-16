@@ -205,9 +205,16 @@ fn test_println_many() {
 fn test_println_output() {
   // verify that the printed lines really appear on the screen
   let s = "Some test string that fits on a single line";
-  println!("{}", s);
-  for (i, c) in s.chars().enumerate() {
-    let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
-    assert_eq!(char::from(screen_char.ascii_character), c);
-  }
+
+  //Fixing a Race Condition
+  use x86_64::instructions::interrupts;
+  interrupts::without_interrupts(|| {
+    let mut writer = WRITER.lock();
+    writeln!(writer, "\n{}", s).expect("writeln failed");
+    // 如果在这时候(刚写完,还没读取)发生中断, 中断处理函数也要写 vga buffer, test就会失败
+    for (i, c) in s.chars().enumerate() {
+      let screen_char = writer.buffer.chars[BUFFER_HEIGHT - 2][i].read();
+      assert_eq!(char::from(screen_char.ascii_character), c);
+    }
+  });
 }

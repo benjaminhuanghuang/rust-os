@@ -77,6 +77,12 @@ pub fn init() {
   x86_64::instructions::interrupts::enable();
 }
 
+pub fn hlt_loop() -> ! {
+  loop {
+    x86_64::instructions::hlt();
+  }
+}
+
 /// Entry point for `cargo test`
 #[cfg(test)] // 只有在集成测试的时候lib才会生成test_main
 #[no_mangle]

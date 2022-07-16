@@ -117,6 +117,9 @@ pub extern "C" fn _start() -> ! {
 
 Fix Deadlock: disable interrupts as long as the Mutex is locked
 
+The without_interrupts function takes a closure and executes it in an interrupt-free environment.
+We use it to ensure that no interrupt can occur as long as the Mutex is locked
+
 ```
 // in src/vga_buffer.rs
 
@@ -132,3 +135,5 @@ pub fn _print(args: fmt::Arguments) {
     });
 }
 ```
+
+## Reading the Scancodes
