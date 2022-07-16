@@ -99,3 +99,36 @@ extern "x86-interrupt" fn timer_interrupt_handler(
     }
 }
 ```
+
+## Deadlock
+
+造成死锁
+
+```
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    […]
+    loop {
+        use blog_os::print;
+        print!("-");        // new
+    }
+}
+```
+
+Fix Deadlock: disable interrupts as long as the Mutex is locked
+
+```
+// in src/vga_buffer.rs
+
+/// Prints the given formatted string to the VGA text buffer
+/// through the global `WRITER` instance.
+#[doc(hidden)]
+pub fn _print(args: fmt::Arguments) {
+    use core::fmt::Write;
+    use x86_64::instructions::interrupts;   // new
+
+    interrupts::without_interrupts(|| {     // new
+        WRITER.lock().write_fmt(args).unwrap();
+    });
+}
+```
