@@ -62,11 +62,19 @@ pub fn exit_qemu(exit_code: QemuExitCode) {
   }
 }
 
+pub fn hlt_loop() -> ! {
+  loop {
+    x86_64::instructions::hlt();
+  }
+}
+
 // 以便os, test 公用代码
 pub fn init() {
   gdt::init();
   interrupts::init_idt();
   unsafe { interrupts::PICS.lock().initialize() };
+  //
+  x86_64::instructions::interrupts::enable();
 }
 
 /// Entry point for `cargo test`
