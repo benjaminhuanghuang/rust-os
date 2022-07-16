@@ -201,13 +201,15 @@ fn test_println_many() {
   }
 }
 
+//// verify that the printed lines really appear on the screen
 #[test_case]
 fn test_println_output() {
-  // verify that the printed lines really appear on the screen
+  use core::fmt::Write;
+  use x86_64::instructions::interrupts;
+
   let s = "Some test string that fits on a single line";
 
   //Fixing a Race Condition
-  use x86_64::instructions::interrupts;
   interrupts::without_interrupts(|| {
     let mut writer = WRITER.lock();
     writeln!(writer, "\n{}", s).expect("writeln failed");

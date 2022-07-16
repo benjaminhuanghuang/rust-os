@@ -136,4 +136,84 @@ pub fn _print(args: fmt::Arguments) {
 }
 ```
 
+## Keyboard Input
+
+```
+// in src/interrupts.rs
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum InterruptIndex {
+    ...
+    Keyboard, // new
+}
+
+lazy_static! {
+    static ref IDT: InterruptDescriptorTable = {
+      ...
+      // new
+      idt[InterruptIndex::Keyboard.as_usize()]
+          .set_handler_fn(keyboard_interrupt_handler);
+
+      idt
+    };
+}
+
+extern "x86-interrupt" fn keyboard_interrupt_handler(
+    _stack_frame: InterruptStackFrame)
+{
+    ...
+}
+```
+
 ## Reading the Scancodes
+
+To find out which key was pressed, we need to query the keyboard controller.
+
+We do this by reading from the data port of the PS/2 controller, which is the I/O port with number 0x60:
+
+```
+// in src/interrupts.rs
+
+extern "x86-interrupt" fn keyboard_interrupt_handler(
+    _stack_frame: InterruptStackFrame)
+{
+    use x86_64::instructions::port::Port;
+
+    let mut port = Port::new(0x60);
+    let scancode: u8 = unsafe { port.read() };
+}
+```
+
+the lower 7 bits of a scancode byte define the key, and the most significant bit defines whether it’s a press (0) or a release (1).
+
+```
+// in src/interrupts.rs
+
+   let mut port = Port::new(0x60);
+    let scancode: u8 = unsafe { port.read() };
+
+    // new
+    let key = match scancode {
+        0x02 => Some('1'),
+        0x03 => Some('2'),
+        0x04 => Some('3'),
+        0x05 => Some('4'),
+        0x06 => Some('5'),
+        0x07 => Some('6'),
+        0x08 => Some('7'),
+        0x09 => Some('8'),
+        0x0a => Some('9'),
+        0x0b => Some('0'),
+        _ => None,
+    };
+```
+
+使用 crate pc-keyboard
+
+```
+# in Cargo.toml
+
+[dependencies]
+pc-keyboard = "0.5.0"
+```
