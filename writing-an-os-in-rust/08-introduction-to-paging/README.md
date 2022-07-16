@@ -44,7 +44,15 @@ The x86_64 architecture uses a 4-level page table and a page size of 4K
 
 ![](./x86_64-page-table-translation-steps.png)
 
+## Translation lookaside buffer (TLB)
+
+CPU instruction called invlpg (“invalidate page”) that removes the translation for the specified page from the TLB
+
+The x86_64 crate provides Rust functions for both variants in the tlb module.
+
 ## Page Faults
+
+The CR2 register is automatically set by the CPU on a page fault and contains the accessed virtual address that caused the page fault
 
 ```
 // in src/interrupts.rs
@@ -76,7 +84,31 @@ extern "x86-interrupt" fn page_fault_handler(
 }
 ```
 
-## Accessing the Page Tables
+- Create Page fault
+
+```
+// in src/main.rs
+
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    println!("Hello World{}", "!");
+
+    blog_os::init();
+
+    // new
+    let ptr = 0xdeadbeaf as *mut u32;
+    unsafe { *ptr = 42; }
+
+    // as before
+    #[cfg(test)]
+    test_main();
+
+    println!("It did not crash!");
+    blog_os::hlt_loop();
+}
+```
+
+- Accessing the Page Tables
 
 ```
 // in src/main.rs

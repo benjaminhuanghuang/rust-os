@@ -13,6 +13,12 @@ pub extern "C" fn _start() -> ! {
 
   blog_os::init();
 
+  // Cause page fault
+  let ptr = 0xdeadbeaf as *mut u32;
+  unsafe {
+    *ptr = 42;
+  }
+
   #[cfg(test)]
   test_main();
 

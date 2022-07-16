@@ -110,6 +110,8 @@ extern "x86-interrupt" fn page_fault_handler(
   stack_frame: InterruptStackFrame,
   error_code: PageFaultErrorCode,
 ) {
+  // The CR2 register is automatically set by the CPU on a page fault
+  // and contains the accessed virtual address that caused the page fault.
   use x86_64::registers::control::Cr2;
 
   println!("EXCEPTION: PAGE FAULT");
