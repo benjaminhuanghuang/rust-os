@@ -47,3 +47,17 @@ bootloader crate defines a `BootInfo` struct that contains all the information i
       […]
   }
 ```
+
+用 entry_point Macro 生成 entry point, bootloader 会调用这个 entry point
+
+```
+  // in src/main.rs
+
+  use bootloader::{BootInfo, entry_point};
+
+  entry_point!(kernel_main);
+
+  fn kernel_main(boot_info: &'static BootInfo) -> ! {
+      […]
+  }
+```
