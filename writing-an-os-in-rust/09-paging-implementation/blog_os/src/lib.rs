@@ -6,6 +6,8 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+#[cfg(test)]
+use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 
 pub mod gdt;
@@ -77,13 +79,16 @@ pub fn init() {
   x86_64::instructions::interrupts::enable();
 }
 
+#[cfg(test)]
+entry_point!(test_kernel_main);
+
 /// Entry point for `cargo test`
-#[cfg(test)] // 只有在集成测试的时候lib才会生成test_main
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-  init(); // init IDT
+#[cfg(test)]
+fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
+  // like before
+  init();
   test_main();
-  loop {}
+  hlt_loop();
 }
 
 #[cfg(test)]

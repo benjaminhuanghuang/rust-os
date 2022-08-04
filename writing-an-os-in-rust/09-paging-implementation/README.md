@@ -17,9 +17,33 @@ There are different ways to create these mappings that all allow us to access ar
   和 Identity Mapping 有同样的问题
 
 - Map the Complete Physical Memory
-
+  ![](./map_physical_memory.png)
 - Temporary Mapping
 
   map the page tables frames only temporarily when we need to access them
+  ![](./temporary-mapping.png)
 
 - Recursive Page Tables
+
+## Bootloader Support
+
+Bootloader 会创建内核运行的页表, 使用 map_physical_memory
+
+```
+[dependencies]
+bootloader = { version = "0.9.8", features = ["map_physical_memory"]}
+```
+
+bootloader 会将完整的物理内存映射到一些未使用的虚拟地址范围。
+
+bootloader crate defines a `BootInfo` struct that contains all the information it passes to our kernel
+
+```
+  use bootloader::{BootInfo, entry_point};
+
+  entry_point!(kernel_main);
+
+  fn kernel_main(boot_info: &'static BootInfo) -> ! {
+      […]
+  }
+```

@@ -5,10 +5,15 @@
 #![reexport_test_harness_main = "test_main"]
 
 use blog_os::println;
+use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+/*
+  defines the real lower level _start entry point for us
+*/
+entry_point!(kernel_main);
+
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
   println!("Hello World{}", "!");
 
   blog_os::init();
