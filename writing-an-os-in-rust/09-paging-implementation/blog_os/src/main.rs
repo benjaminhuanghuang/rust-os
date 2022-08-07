@@ -13,15 +13,21 @@ use core::panic::PanicInfo;
 */
 entry_point!(kernel_main);
 
+// called by bootloader
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-  println!("Hello World{}", "!");
+  use blog_os::memory::active_level_4_table;
+  use x86_64::VirtAddr;
 
+  println!("Hello World{}", "!");
   blog_os::init();
 
-  // Cause page fault
-  let ptr = 0xdeadbeaf as *mut u32;
-  unsafe {
-    *ptr = 42;
+  let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+  let l4_table = unsafe { active_level_4_table(phys_mem_offset) };
+
+  for (i, entry) in l4_table.iter().enumerate() {
+    if !entry.is_unused() {
+      println!("L4 Entry {}: {:?}", i, entry);
+    }
   }
 
   #[cfg(test)]
