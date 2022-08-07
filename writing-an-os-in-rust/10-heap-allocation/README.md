@@ -46,6 +46,7 @@ fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
 ```
 
 在 .cargo/config.toml 中加入 alloc
+Since we are compiling for a custom target, we can’t use the precompiled version of alloc that is shipped with the Rust installation. Instead, we have to tell cargo to recompile the crate from source.
 
 ```
 [unstable]
@@ -71,4 +72,31 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println!("It did not crash!");
     blog_os::hlt_loop();
 }
+```
+
+## Creating a Kernel Heap
+
+```
+// in src/allocator.rs
+
+pub const HEAP_START: usize = 0x_4444_4444_0000;
+pub const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
+```
+
+## Using an Allocator Crate
+
+```
+# in Cargo.toml
+
+[dependencies]
+linked_list_allocator = "0.9.0"
+```
+
+```
+// in src/allocator.rs
+
+use linked_list_allocator::LockedHeap;
+
+#[global_allocator]
+static ALLOCATOR: LockedHeap = LockedHeap::empty();
 ```
