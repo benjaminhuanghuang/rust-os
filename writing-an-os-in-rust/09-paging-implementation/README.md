@@ -61,3 +61,5 @@ bootloader crate defines a `BootInfo` struct that contains all the information i
       […]
   }
 ```
+
+## Implementation
