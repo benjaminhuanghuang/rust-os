@@ -33,3 +33,42 @@ Statics live for the complete runtime of the program
 
 extern crate alloc;
 ```
+
+```
+// in src/lib.rs
+
+#![feature(alloc_error_handler)] // at the top of the file
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
+}
+```
+
+在 .cargo/config.toml 中加入 alloc
+
+```
+[unstable]
+build-std = ["core", "compiler_builtins", "alloc"]
+```
+
+使用
+
+```
+// in src/main.rs
+
+extern crate alloc;
+
+use alloc::boxed::Box;
+
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    // […] print "Hello World!", call `init`, create `mapper` and `frame_allocator`
+
+    let x = Box::new(41);
+
+    // […] call `test_main` in test mode
+
+    println!("It did not crash!");
+    blog_os::hlt_loop();
+}
+```
