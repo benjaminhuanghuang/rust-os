@@ -10,11 +10,13 @@
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
 
+extern crate alloc;
+
 pub mod gdt;
 pub mod interrupts;
+pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
-pub mod memory;
 
 pub trait Testable {
   fn run(&self) -> ();
