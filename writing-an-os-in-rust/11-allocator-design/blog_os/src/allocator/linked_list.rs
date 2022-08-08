@@ -1,3 +1,5 @@
+#![feature(const_mut_refs)]
+
 use super::{align_up, Locked};
 use alloc::alloc::{GlobalAlloc, Layout};
 use core::{mem, ptr};
